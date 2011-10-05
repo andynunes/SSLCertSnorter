@@ -1,0 +1,170 @@
+Reputation Preprocessor
+================================================================================
+Hui Cao
+
+##########################################
+# THIS CODE IS STILL EXPERIMENTAL!
+# DO NOT USE IN PRODUCTION ENVIRONMENTS.
+# Please send any issues to the Snort team
+##########################################
+
+Overview
+================================================================================
+Reputation preprocessor provides basic IP blacklist/whitelist capabilities, to 
+block/drop/pass traffic from IP addresses listed. In the past, we use standard 
+Snort rules to implement Reputation-based IP blocking. This preprocessor will 
+address the performance issue and make the IP reputation management easier.
+Repuation preprocessor runs before other preprocessors.
+
+Sections:
+    Configuration
+    IP list file format
+    Events
+
+Configuration
+================================================================================
+The preprocessor configuration name is "reputation".
+
+preprocessor reputation
+
+Option         Argument            Required  Default
+memcap         <memcap>             No       memcap 500
+scan_local      None                No       off 
+blacklist      <list file name>     No       NULL
+whitelist      <list file name>     No       NULL
+priority      [blacklist whitelist] No       priority whitelist
+nested_ip     [inner outer both]    No       nested_ip inner
+
+
+memcap        = 1 - 4095 Mbytes
+
+preprocessor reputation:\ 
+            < memcap  number >,\
+            < scanLocal >, \
+            < blacklist  < list filename >>,\
+            < whitelist < list filename >>,\
+            < priority  [blacklist whitelist] >,\
+            < nested_ip  [inner outer both] >
+Options:
+
+  < memcap number >: 
+           maximum total memory allocated (in Megabytes). It can be set up to  
+           4095 Megabytes.   
+       
+  < scan_local > : 
+           Enable to inspect local address defined in RFC 1918:
+             10.0.0.0        -   10.255.255.255  (10/8 prefix)
+             172.16.0.0      -   172.31.255.255  (172.16/12 prefix)
+             192.168.0.0     -   192.168.255.255 (192.168/16 prefix)
+               
+  < list filename > : 
+           The IP lists are loaded from external files. It supports relative 
+           paths for inclusion and $variables for path. Multiple blacklists or 
+           whitelists are supported.
+          
+           Note: if the same IP is redefined later, it will overwrite the 
+           previous one. In other words, IP lists always favors the last file or
+           entry processed.
+           
+  < priority > :  
+           Specify either blacklist or whitelist has higher priority when 
+           source/destination is on blacklist while destination/source is on 
+           whitelist. By default, whitelist has higher priority. In other words,
+           the packet will be passed when either source or destination is 
+           whitelisted.
+           
+           Note: this only defines priority when there is a decision conflict, 
+           during run-time. During initialization time, if the same IP address 
+           is defined in whitelist and blacklist, whoever the last one defined 
+           will be the final one. Priority does not work on this case.
+         
+  < nested_ip >: 
+           Specify which IP address to be used when there is IP encapsulation. 
+
+
+Configuration examples
+
+  Default configuration
+    # Standard blacklisting. 
+    # If running in inline mode the packets will be dropped.
+    preprocessor reputation:\ 
+                  blacklist /etc/snort/default.blacklist, \
+                  whitelist /etc/snort/default.whitelist
+  
+  Inspect inner and outer IP configuration
+    # Inspect both inner and outer,  Also adds a whitelist entry
+    # to make exceptions.
+    preprocessor reputation: n
+                     nested_ip both, \
+                     blacklist /etc/snort/default.blacklist, \
+                     whitelist /etc/snort/default.whitelist
+  Full configuration
+    # Blacklisting with scan local network, use both headers, 
+    # and whitelist has higher priority.  
+    # Also adds a whitelist entry to make exceptions.
+    preprocessor reputation: \
+                     memcap  200, scan_local, nested_ip both, \
+                     priority whitelist, \
+                     blacklist /etc/snort/default.blacklist, \
+                     whitelist /etc/snort/default.whitelist
+  
+  Variable path/file configuration
+   
+  $REP_BLACK_FILE1 = ../dshield.list
+  $REP_BLACK_FILE2 = ../snort.org.list
+  preprocessor reputation: \
+                blacklist $REP_BLACK_FILE1,\
+                blacklist $REP_BLACK_FILE2
+
+IP List File Format
+  
+  Syntax
+    The IP list file has 1 entry per line. The entry can be either IP entry or 
+    comment. 
+  
+  IP Entry
+    CIDR notation <comments> line break
+    Example:
+      172.16.42.32/32
+  
+  Comment
+    # <comments>
+    Example:
+      # This is a full line comment
+      
+  IP List File Example
+    ----------------------
+    # This is a full line comment
+    172.16.42.32/32    # This is an inline comment, line with single CIDR block
+
+Use case
+  
+  A user wants to protect his/her network from unwanted/unknown IPs, only 
+  allowing some trusted IPs. Here is the configuration:
+  
+  preprocessor reputation: \
+        blacklist /etc/snort/default.blacklist
+        whitelist /etc/snort/default.whitelist
+  
+  In file "default.blacklist"  
+        # These two entries will match all ipv4 addresses
+        1.0.0.0/1 
+        128.0.0.0/1
+  
+  In file "default.whitelist"
+        68.177.102.22 # sourcefire.com
+        74.125.93.104 # google.com
+
+Events
+================================================================================
+The preprocessor uses GID 136 to register events.
+ 
+
+SID   Description 
+--------------------------------------------------------------------------------
+  1   Packets are blacklisted. 
+  2   Packets are whitelisted.
+
+Rule Options
+================================================================================
+  No rule options    
