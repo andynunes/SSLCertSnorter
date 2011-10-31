@@ -22,6 +22,9 @@
  * Adam Keeton
  * ssl.c
  * 10/09/07
+ *
+ * Modified by Andy Nunes
+ * 10/4/11
 */
 #ifdef HAVE_CONFIG_H
 #include <config.h>
@@ -32,6 +35,7 @@
 #endif
 #include "sf_snort_packet.h"
 #include "ssl.h"
+#include "cert_logger.h"
 
 #define THREE_BYTE_LEN(x) (x[2] | x[1] << 8 | x[0] << 16)
 
@@ -71,12 +75,16 @@ static uint32_t SSL_decode_version_v3(uint8_t major, uint8_t minor)
 }
 
 static uint32_t SSL_decode_handshake_v3(const uint8_t *pkt , int size, 
-                                         uint32_t cur_flags, uint32_t pkt_flags) 
+                                         uint32_t cur_flags, uint32_t pkt_flags,
+                                        const SFSnortPacket *packet,
+                                        const SSL_record_t *record)
 {
     SSL_handshake_t *handshake;
     SSL_handshake_hello_t *hello;
     uint32_t hs_len;
     uint32_t retval = 0;
+    
+//    printf("Entering SSL_decode_handshake_v3 with size = %d\n", size);
 
     while (size > 0)
     {
@@ -169,6 +177,16 @@ static uint32_t SSL_decode_handshake_v3(const uint8_t *pkt , int size,
 
             case SSL_HS_CERT:
                 retval |= SSL_CERTIFICATE_FLAG;
+                //AN: call my own verification function
+                if (size >= hs_len) {
+                    printf("Going to call SSL_cert_dump with size = %d"
+                           " and hs_len = %d\n", size, hs_len);
+                    SSL_cert_dump(pkt, size, packet, record);
+                }
+                else {
+//                    printf("Not calling SSL_cert_dump because size is %d"
+//                           " and hs_len is %d\n", size, hs_len);
+                }
                 break;
 
                 /* The following types are not presently of interest */
@@ -197,7 +215,8 @@ static uint32_t SSL_decode_handshake_v3(const uint8_t *pkt , int size,
     return retval;
 }
 
-static uint32_t SSL_decode_v3(const uint8_t *pkt, int size, uint32_t pkt_flags)
+static uint32_t SSL_decode_v3(const uint8_t *pkt, int size, uint32_t pkt_flags,
+                              const SFSnortPacket *packet)
 {
     SSL_record_t *record;
     uint32_t retval = 0;
@@ -243,7 +262,7 @@ static uint32_t SSL_decode_v3(const uint8_t *pkt, int size, uint32_t pkt_flags)
                 if(!(retval & SSL_CHANGE_CIPHER_FLAG)) 
                 {
                     int hsize = size < (int)reclen ? size : (int)reclen;
-                    retval |= SSL_decode_handshake_v3(pkt, hsize, retval, pkt_flags);
+                    retval |= SSL_decode_handshake_v3(pkt, hsize, retval, pkt_flags, packet, record);
                 }
                 else if (ccs)
                 {
@@ -368,11 +387,22 @@ static uint32_t SSL_decode_v2(const uint8_t *pkt, int size, uint32_t pkt_flags)
     return retval | SSL_VER_SSLV2_FLAG;
 }
 
-uint32_t SSL_decode(const uint8_t *pkt, int size, uint32_t pkt_flags)
+uint32_t SSL_decode(const SFSnortPacket *packet)
+//uint32_t SSL_decode(const uint8_t *pkt, int size, uint32_t pkt_flags)
 {
     SSL_record_t *record;
     uint16_t reclen;
     uint32_t datalen;
+    
+    //declare locals to replace previus function arguments
+    uint32_t pkt_flags;
+    uint8_t *pkt;
+    int size;
+    
+    //get fields of SFSnortPacket that were previously sent as arguments
+    pkt_flags = packet->flags;
+    pkt = packet->payload;
+    size = (int)packet->payload_size;
 
     if(!pkt || !size) 
         return SSL_ARG_ERROR_FLAG;
@@ -391,7 +421,7 @@ uint32_t SSL_decode(const uint8_t *pkt, int size, uint32_t pkt_flags)
      * SSLv2 as TLS,the decoder will either catch a bad type, bad version, or 
      * indicate that it is truncated. */
     if(size == 5)
-        return SSL_decode_v3(pkt, size, pkt_flags);
+        return SSL_decode_v3(pkt, size, pkt_flags, packet);
 
     /* At this point, 'size' has to be > 5 */
 
@@ -437,6 +467,6 @@ uint32_t SSL_decode(const uint8_t *pkt, int size, uint32_t pkt_flags)
             return SSL_decode_v2(pkt, size, pkt_flags);
     }
 
-    return SSL_decode_v3(pkt, size, pkt_flags);
+    return SSL_decode_v3(pkt, size, pkt_flags, packet);
 }
 
