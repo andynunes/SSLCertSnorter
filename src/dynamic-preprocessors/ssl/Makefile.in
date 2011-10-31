@@ -241,7 +241,11 @@ spp_ssl.h \
 ${top_srcdir}/src/dynamic-preprocessors/libs/ssl.c \
 ${top_srcdir}/src/dynamic-preprocessors/libs/ssl.h \
 ${top_srcdir}/src/dynamic-preprocessors/libs/sfparser.c \
-${top_srcdir}/src/dynamic-preprocessors/libs/sfcommon.h
+${top_srcdir}/src/dynamic-preprocessors/libs/sfcommon.h \
+${top_srcdir}/src/dynamic-preprocessors/libs/cert_logger.c \
+${top_srcdir}/src/dynamic-preprocessors/libs/cert_logger.h \
+${top_srcdir}/src/dynamic-preprocessors/libs/cencode.c \
+${top_srcdir}/src/dynamic-preprocessors/libs/cencode.h
 
 EXTRA_DIST = \
 sf_ssl.dsp

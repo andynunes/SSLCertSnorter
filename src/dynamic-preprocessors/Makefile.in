@@ -71,9 +71,11 @@ am__installdirs = "$(DESTDIR)$(preproclibdir)" \
 	"$(DESTDIR)$(preprocdir)"
 LTLIBRARIES = $(preproclib_LTLIBRARIES)
 libsf_dynamic_preproc_la_LIBADD =
-am__libsf_dynamic_preproc_la_SOURCES_DIST = libs/ssl.c libs/sfparser.c
+am__libsf_dynamic_preproc_la_SOURCES_DIST = libs/ssl.c libs/sfparser.c libs/cencode.c libs/cert_logger.c
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@am_libsf_dynamic_preproc_la_OBJECTS = libsf_dynamic_preproc_la-ssl.lo \
-@HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@	libsf_dynamic_preproc_la-sfparser.lo
+@HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@	libsf_dynamic_preproc_la-sfparser.lo \
+@HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@	libsf_dynamic_preproc_la-cert_logger.lo \
+@HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@	libsf_dynamic_preproc_la-cencode.lo
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@nodist_libsf_dynamic_preproc_la_OBJECTS = libsf_dynamic_preproc_la-sf_dynamic_preproc_lib.lo \
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@	libsf_dynamic_preproc_la-sf_ip.lo \
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@	libsf_dynamic_preproc_la-sfrt.lo \
@@ -301,13 +303,17 @@ AUTOMAKE_OPTIONS = foreign no-dependencies
 
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@libsf_dynamic_preproc_la_SOURCES = \
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@libs/ssl.c \
-@HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@libs/sfparser.c
+@HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@libs/sfparser.c \
+@HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@libs/cencode.c \
+@HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@libs/cert_logger.c
 
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@preprocdir = $(pkgincludedir)/dynamic_preproc
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@nodist_preproc_HEADERS = \
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@libs/ssl.h \
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@libs/sfcommon.h \
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@libs/sf_preproc_info.h \
+@HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@libs/cencode.h \
+@HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@libs/cert_logger.h \
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@include/sf_snort_packet.h \
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@include/sf_protocols.h \
 @HAVE_DYNAMIC_PLUGINS_TRUE@@SO_WITH_STATIC_LIB_TRUE@include/sf_snort_plugin_api.h \
@@ -665,6 +671,12 @@ libsf_dynamic_preproc_la-ssl.lo: libs/ssl.c
 
 libsf_dynamic_preproc_la-sfparser.lo: libs/sfparser.c
 	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsf_dynamic_preproc_la_CFLAGS) $(CFLAGS) -c -o libsf_dynamic_preproc_la-sfparser.lo `test -f 'libs/sfparser.c' || echo '$(srcdir)/'`libs/sfparser.c
+
+libsf_dynamic_preproc_la-cencode.lo: libs/cencode.c
+	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsf_dynamic_preproc_la_CFLAGS) $(CFLAGS) -c -o libsf_dynamic_preproc_la-cencode.lo `test -f 'libs/cencode.c' || echo '$(srcdir)/'`libs/cencode.c
+
+libsf_dynamic_preproc_la-cert_logger.lo: libs/cert_logger.c
+	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsf_dynamic_preproc_la_CFLAGS) $(CFLAGS) -c -o libsf_dynamic_preproc_la-cert_logger.lo `test -f 'libs/cert_logger.c' || echo '$(srcdir)/'`libs/cert_logger.c
 
 libsf_dynamic_preproc_la-sf_dynamic_preproc_lib.lo: include/sf_dynamic_preproc_lib.c
 	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsf_dynamic_preproc_la_CFLAGS) $(CFLAGS) -c -o libsf_dynamic_preproc_la-sf_dynamic_preproc_lib.lo `test -f 'include/sf_dynamic_preproc_lib.c' || echo '$(srcdir)/'`include/sf_dynamic_preproc_lib.c

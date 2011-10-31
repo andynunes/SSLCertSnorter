@@ -71,9 +71,11 @@ am__installdirs = "$(DESTDIR)$(preproclibdir)" \
 	"$(DESTDIR)$(preprocdir)"
 LTLIBRARIES = $(preproclib_LTLIBRARIES)
 libsf_dynamic_preproc_la_LIBADD =
-am__libsf_dynamic_preproc_la_SOURCES_DIST = libs/ssl.c libs/sfparser.c
+am__libsf_dynamic_preproc_la_SOURCES_DIST = libs/ssl.c libs/sfparser.c libs/cencode.c libs/cert_logger.c
 am_libsf_dynamic_preproc_la_OBJECTS = libsf_dynamic_preproc_la-ssl.lo \
-	libsf_dynamic_preproc_la-sfparser.lo
+	libsf_dynamic_preproc_la-sfparser.lo \
+	libsf_dynamic_preproc_la-cert_logger.lo \
+	libsf_dynamic_preproc_la-cencode.lo
 nodist_libsf_dynamic_preproc_la_OBJECTS = libsf_dynamic_preproc_la-sf_dynamic_preproc_lib.lo \
 	libsf_dynamic_preproc_la-sf_ip.lo \
 	libsf_dynamic_preproc_la-sfrt.lo \
@@ -152,12 +154,12 @@ am__relativize = \
     dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
   done; \
   reldir="$$dir2"
-ACLOCAL = ${SHELL} /root/snorttmp/snort-2.9.1/missing --run aclocal-1.11
-AMTAR = ${SHELL} /root/snorttmp/snort-2.9.1/missing --run tar
+ACLOCAL = ${SHELL} /home/andy/Dropbox/snort/missing --run aclocal-1.11
+AMTAR = ${SHELL} /home/andy/Dropbox/snort/missing --run tar
 AR = ar
-AUTOCONF = ${SHELL} /root/snorttmp/snort-2.9.1/missing --run autoconf
-AUTOHEADER = ${SHELL} /root/snorttmp/snort-2.9.1/missing --run autoheader
-AUTOMAKE = ${SHELL} /root/snorttmp/snort-2.9.1/missing --run automake-1.11
+AUTOCONF = ${SHELL} /home/andy/Dropbox/snort/missing --run autoconf
+AUTOHEADER = ${SHELL} /home/andy/Dropbox/snort/missing --run autoheader
+AUTOMAKE = ${SHELL} /home/andy/Dropbox/snort/missing --run automake-1.11
 AWK = mawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
@@ -202,7 +204,7 @@ LIPO =
 LN_S = ln -s
 LTLIBOBJS = 
 MAINT = #
-MAKEINFO = ${SHELL} /root/snorttmp/snort-2.9.1/missing --run makeinfo
+MAKEINFO = ${SHELL} /home/andy/Dropbox/snort/missing --run makeinfo
 MKDIR_P = /bin/mkdir -p
 NM = /usr/bin/nm -B
 NMEDIT = 
@@ -229,10 +231,10 @@ STRIP = strip
 VERSION = 2.9.1
 XCCFLAGS = 
 YACC = bison -y
-abs_builddir = /root/snorttmp/snort-2.9.1/src/dynamic-preprocessors
-abs_srcdir = /root/snorttmp/snort-2.9.1/src/dynamic-preprocessors
-abs_top_builddir = /root/snorttmp/snort-2.9.1
-abs_top_srcdir = /root/snorttmp/snort-2.9.1
+abs_builddir = /home/andy/Dropbox/snort/src/dynamic-preprocessors
+abs_srcdir = /home/andy/Dropbox/snort/src/dynamic-preprocessors
+abs_top_builddir = /home/andy/Dropbox/snort
+abs_top_srcdir = /home/andy/Dropbox/snort
 ac_ct_CC = gcc
 ac_ct_DUMPBIN = 
 am__include = include
@@ -261,7 +263,7 @@ host_vendor = pc
 htmldir = ${docdir}
 includedir = ${prefix}/include
 infodir = ${datarootdir}/info
-install_sh = ${SHELL} /root/snorttmp/snort-2.9.1/install-sh
+install_sh = ${SHELL} /home/andy/Dropbox/snort/install-sh
 libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
@@ -301,13 +303,17 @@ include/sf_email_attach_decode.c
 
 libsf_dynamic_preproc_la_SOURCES = \
 libs/ssl.c \
-libs/sfparser.c
+libs/sfparser.c \
+libs/cencode.c \
+libs/cert_logger.c
 
 preprocdir = $(pkgincludedir)/dynamic_preproc
 nodist_preproc_HEADERS = \
 libs/ssl.h \
 libs/sfcommon.h \
 libs/sf_preproc_info.h \
+libs/cencode.h \
+libs/cert_logger.h \
 include/sf_snort_packet.h \
 include/sf_protocols.h \
 include/sf_snort_plugin_api.h \
@@ -665,6 +671,12 @@ libsf_dynamic_preproc_la-ssl.lo: libs/ssl.c
 
 libsf_dynamic_preproc_la-sfparser.lo: libs/sfparser.c
 	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsf_dynamic_preproc_la_CFLAGS) $(CFLAGS) -c -o libsf_dynamic_preproc_la-sfparser.lo `test -f 'libs/sfparser.c' || echo '$(srcdir)/'`libs/sfparser.c
+
+libsf_dynamic_preproc_la-cencode.lo: libs/cencode.c
+	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsf_dynamic_preproc_la_CFLAGS) $(CFLAGS) -c -o libsf_dynamic_preproc_la-cencode.lo `test -f 'libs/cencode.c' || echo '$(srcdir)/'`libs/cencode.c
+
+libsf_dynamic_preproc_la-cert_logger.lo: libs/cert_logger.c
+	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsf_dynamic_preproc_la_CFLAGS) $(CFLAGS) -c -o libsf_dynamic_preproc_la-cert_logger.lo `test -f 'libs/cert_logger.c' || echo '$(srcdir)/'`libs/cert_logger.c
 
 libsf_dynamic_preproc_la-sf_dynamic_preproc_lib.lo: include/sf_dynamic_preproc_lib.c
 	$(LIBTOOL)  --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libsf_dynamic_preproc_la_CFLAGS) $(CFLAGS) -c -o libsf_dynamic_preproc_la-sf_dynamic_preproc_lib.lo `test -f 'include/sf_dynamic_preproc_lib.c' || echo '$(srcdir)/'`include/sf_dynamic_preproc_lib.c

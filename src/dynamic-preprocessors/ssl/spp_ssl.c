@@ -156,7 +156,7 @@ static inline uint32_t SSLPP_process_alert(
     config = (SSLPP_config_t *)sfPolicyUserDataGetCurrent(ssl_config);
 
     DEBUG_WRAP(DebugMessage(DEBUG_SSL, "Process Alert\n"););
-    printf("AN: SSLPP_process_alert\n");
+    //printf("An: SSLPP_process_alert\n");
 
     ssn_flags |= new_flags;
 
@@ -185,7 +185,7 @@ static inline uint32_t SSLPP_process_alert(
 static inline uint32_t SSLPP_process_hs(uint32_t ssl_flags, uint32_t new_flags)
 {
     DEBUG_WRAP(DebugMessage(DEBUG_SSL, "Process Handshake\n"););
-    printf("AN: SSLPP_process_hs\n");
+    //printf("An: SSLPP_process_hs\n");
 
     if(!SSL_BAD_HS(new_flags))
     {
@@ -210,7 +210,7 @@ static inline uint32_t SSLPP_process_app(
     config = (SSLPP_config_t *)sfPolicyUserDataGetCurrent(ssl_config);
 
     DEBUG_WRAP(DebugMessage(DEBUG_SSL, "Process Application\n"););
-    printf("AN: SSLPP_process_app\n");
+    //printf("An: SSLPP_process_app\n");
 
     if(!(config->flags & SSLPP_DISABLE_FLAG))
         return ssn_flags | new_flags;
@@ -299,7 +299,7 @@ static void SSLPP_process(void *raw_packet, void *context)
     SSLPP_config_t *config = NULL;
     PROFILE_VARS;
 
-    printf("AN: SSLPP_process\n");
+    //printf("An: SSLPP_process\n");
 
     sfPolicyUserPolicySet (ssl_config, _dpd.getRuntimePolicy());
     config = (SSLPP_config_t *)sfPolicyUserDataGetCurrent(ssl_config);
@@ -460,8 +460,11 @@ static void SSLPP_process(void *raw_packet, void *context)
         DEBUG_WRAP(DebugMessage(DEBUG_SSL, "Payload size < 5 bytes"););
     }
 #endif
+    
+    //printf("An: About to call SSL_decode from SSLPP_process()\n");
 
-    new_flags = SSL_decode(packet->payload, (int)packet->payload_size, packet->flags);
+    //new_flags = SSL_decode(packet->payload, (int)packet->payload_size, packet->flags);
+    new_flags = SSL_decode(packet);
 
     if( SSL_IS_CHELLO(new_flags) && SSL_IS_CHELLO(ssn_flags) && SSL_IS_SHELLO(ssn_flags) )
     {
@@ -579,7 +582,7 @@ static int SSLPP_state_init(char *name, char *params, void **data)
 
     tok = strtok_r(params, ",", &end);
 
-    //printf("AN: SSLPP_state_init - Debug level is %d\n", GetDebugLevel());
+    ////printf("An: SSLPP_state_init - Debug level is %d\n", GetDebugLevel());
 
     if(!tok)
         DynamicPreprocessorFatalMessage("%s(%d) => missing argument to"
@@ -658,7 +661,7 @@ static int SSLPP_ver_init(char *name, char *params, void **data)
 
     tok = strtok_r(params, ",", &end);
 
-    //printf("AN: SSLPP_ver_init - Debug level is %d\n", GetDebugLevel());
+    ////printf("An: SSLPP_ver_init - Debug level is %d\n", GetDebugLevel());
 
     if(!tok)
         DynamicPreprocessorFatalMessage("%s(%d) => missing argument to"
@@ -756,7 +759,7 @@ static void SSLPP_config(SSLPP_config_t *config, char *conf)
     char *search;
     SFP_errstr_t err;
 
-    //printf("AN: SSLPP_config - Debug level is %d\n", GetDebugLevel());
+    ////printf("An: SSLPP_config - Debug level is %d\n", GetDebugLevel());
 
     if(!conf)
         return;
