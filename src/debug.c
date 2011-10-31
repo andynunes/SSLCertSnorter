@@ -70,6 +70,9 @@ void DebugMessageFunc(int level, char *fmt, ...)
 {
     va_list ap;
 
+//    if ((level!=DEBUG_SSL) && !(level & GetDebugLevel()))
+//        return;
+    
     if (!(level & GetDebugLevel()))
         return;
 
