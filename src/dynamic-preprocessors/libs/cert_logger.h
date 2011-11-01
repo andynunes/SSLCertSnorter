@@ -31,6 +31,16 @@ void SSL_cert_dump(const uint8_t *pkt , int size_p,
 
 char* encode_base_64(const char *cert, int *length);
 
-int write_to_log(const uint8_t *pkt, int size, uint32_t sqn_num);
+int write_to_log(const uint8_t *pkt, int size, uint32_t sqn_num, struct timeval time);
+
+//typedef struct _certMetaData
+//{
+//    char *srcIP;
+//    char *dstIP;
+//    uint32_t min_version;
+//    uint32_t maj_version;
+//    uint32_t sqn_num;
+//    
+//} certMetaData;
 
 #endif
